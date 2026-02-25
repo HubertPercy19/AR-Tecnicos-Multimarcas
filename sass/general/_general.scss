@@ -1,106 +1,125 @@
-*{
+* {
     box-sizing: border-box;
 }
-html{
+
+html {
     margin: 0;
     padding: 0;
 }
 
 /* Breakpoints */
 $breakpoints: (
-  xs            : 360px,
-  sm            : 480px,
-  md            : 768px,
-  lg            : 1024px,
-  xl            : 1280px,
-  xxl           :  1440px,
-  hd            :  1920px
+    xs : 360px,
+    sm : 480px,
+    md : 768px,
+    lg : 1024px,
+    xl : 1280px,
+    xxl : 1440px,
+    hd : 1920px
 );
-$screen-xs-min  :  360px;
-$screen-sm-min  :  480px;
-$screen-md-min  :  640px;
-$screen-lg-min  :  1024px;
-$screen-xl-min  :  1280px;
-$screen-xxl-min :  1440px;
-$screen-hd-min  :  1920px;
+$screen-xs-min : 360px;
+$screen-sm-min : 480px;
+$screen-md-min : 640px;
+$screen-lg-min : 1024px;
+$screen-xl-min : 1280px;
+$screen-xxl-min : 1440px;
+$screen-hd-min : 1920px;
 
 @mixin mediaFrom($size) {
-  @media (min-width: map-get($breakpoints, $size)) {
-    @content;
-  }
+    @media (min-width: map-get($breakpoints, $size)) {
+        @content;
+    }
 }
 
 /* Colors */
-$colorPrimary   : #252840;
+$colorPrimary : #252840;
 $colorSecondary : #ffffff;
-$colorTertiary  : #7d8087;
+$colorTertiary : #7d8087;
 $colorQuaternary: #074eb9;
 
 /* Fonts */
-$font-bold      : 700;
-$font-medium    : 500;
-$font-regular   : 400;
-$font-base      : "Plus Jakarta Sans", sans-serif;
+$font-bold : 700;
+$font-medium : 500;
+$font-regular : 400;
+$font-base : "Plus Jakarta Sans",
+sans-serif;
 
 
-body{
+body {
     margin: 0;
     font-family: $font-base;
 }
 
-h1{
+h1 {
     margin: 0;
     font-weight: $font-bold;
     color: $colorSecondary;
 }
-h2,h3,h4{
+
+h2,
+h3,
+h4 {
     margin: 0;
     font-weight: $font-medium;
 }
-h2{
+
+h2 {
     font-size: 24px;
     margin-bottom: 32px;
+
     @include mediaFrom(md) {
         font-size: 36px;
     }
 }
-h3{
+
+h3 {
     font-size: 18px;
 }
-h2,h3{
+
+h2,
+h3 {
     color: $colorPrimary;
 }
-p{
+
+p {
     margin: 0;
 }
-a{
+
+a {
     text-decoration: none;
 }
-strong{
+
+strong {
     color: $colorPrimary;
 }
-ul{
+
+ul {
     padding: 0;
     margin: 0;
 }
-li{
+
+li {
     list-style: none;
 }
-figure{
+
+figure {
     margin: 0;
 }
-img{
+
+img {
     width: 100%;
     max-width: 100%;
 }
+
 button,
 input,
-textarea{
+textarea {
     background-color: transparent;
     border: 0;
     font-family: inherit;
 }
-.button-float{
+
+.button-float {
     position: fixed;
     bottom: 20px;
     right: 10px;
@@ -109,6 +128,7 @@ textarea{
     align-items: center;
     row-gap: 10px;
     z-index: 100;
+
     & a {
         display: inline-block;
         width: 50px;
@@ -117,63 +137,76 @@ textarea{
         background-color: $colorSecondary;
         border-radius: 100%;
         box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+
         @include mediaFrom(md) {
             width: 50px;
             height: 50px;
         }
-        &:hover{
+
+        &:hover {
             background-color: $colorPrimary;
+
             .button-float-svg-cel,
-            .button-float-svg-phone{
+            .button-float-svg-phone {
                 fill: $colorSecondary;
-                
+
             }
-            .button-float-svg-wasap{
+
+            .button-float-svg-wasap {
                 fill: $colorSecondary;
             }
         }
     }
-    & svg{
+
+    & svg {
         width: 100%;
     }
-    & &-svg{
+
+    & &-svg {
         fill: $colorPrimary;
-        &-wasap{
+
+        &-wasap {
             fill: #25d366;
         }
     }
 }
-main{
-    & section{
+
+main {
+    & section {
         padding: 0 16px;
         margin-bottom: 48px;
+
         @include mediaFrom(lg) {
             max-width: 960px;
             margin-left: auto;
             margin-right: auto;
             margin-bottom: 64px;
         }
+
         @include mediaFrom(xxl) {
             max-width: 1248px;
         }
-        &:first-child,
-        &:nth-child(13){
+
+        &.section__content__banner {
             padding: 0;
+
             @include mediaFrom(lg) {
                 max-width: 100%;
             }
-        }    
+        }
     }
 }
 
 
-footer{
+footer {
     padding: 0 16px;
+
     @include mediaFrom(lg) {
         max-width: 960px;
         margin-left: auto;
         margin-right: auto;
     }
+
     @include mediaFrom(xxl) {
         max-width: 1248px;
     }

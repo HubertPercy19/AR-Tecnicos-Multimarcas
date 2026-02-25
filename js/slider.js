@@ -1,156 +1,122 @@
 const initSlider = () => {
-    const sliderContent = document.querySelector('.slider-track');
-    const buttonNext = document.querySelector('.slider-next');
-    const buttonPreview = document.querySelector('.slider-prev');
+    const sliderContainer = document.querySelector('.slider-track');
+    const next = document.querySelector('.slider-next');
+    const prev = document.querySelector('.slider-prev');
 
-    let slidesPerView = window.innerWidth >= 768 ? 3 : 1;
-    let originalSlides = [...document.querySelectorAll('.slides')];
-    let slideItem = [];
-    let index = slidesPerView;
-    let speed = 5000;
-    let intervalID = null;
-    let isMoving = false;
+    let index = 0;
+    let slides;
+    let autoplayInterval;
+    const AUTOPLAY_TIME = 3000;
 
-    function getWidthSlide() {
-        return sliderContent.clientWidth / slidesPerView;
+    /* 🔹 Cuántos visibles */
+    function imagesPerView() {
+        return window.innerWidth >= 768 ? 3 : 1;
     }
 
-    // ------------------------------
-    // 🔁 CREAR CLONES
-    // ------------------------------
-    function createClones() {
-        sliderContent.innerHTML = ""; // limpiar
-       
-        // agregar clones al inicio
-        for (let i = slidesPerView; i > 0; i--) {
-            const clone = originalSlides[originalSlides.length - i].cloneNode(true);
-            sliderContent.appendChild(clone);
+    /* 🔹 Clonado dinámico */
+    function cloneSlides() {
+        const originals = document.querySelectorAll('.slider-track .slides:not(.clone)');
+        const perView = imagesPerView();
+
+        // eliminar clones previos
+        sliderContainer.querySelectorAll('.clone').forEach(c => c.remove());
+
+        // clonar atrás
+        for (let i = originals.length - perView; i < originals.length; i++) {
+            const clone = originals[i].cloneNode(true);
+            clone.classList.add('clone');
+            sliderContainer.insertBefore(clone, sliderContainer.firstChild);
         }
 
-        // agregar slides originales
-        originalSlides.forEach(s => sliderContent.appendChild(s.cloneNode(true)));
-
-        // agregar clones al final
-        for (let i = 0; i < slidesPerView; i++) {
-            const clone = originalSlides[i].cloneNode(true);
-            sliderContent.appendChild(clone);
+        // clonar adelante
+        for (let i = 0; i < perView; i++) {
+            const clone = originals[i].cloneNode(true);
+            clone.classList.add('clone');
+            sliderContainer.appendChild(clone);
         }
 
-        slideItem = sliderContent.querySelectorAll(".slides");
+        slides = document.querySelectorAll('.slider-track .slides');
+        index = perView;
     }
 
-    // ------------------------------
-    // 🔁 POSICIONAR INICIAL
-    // ------------------------------
-    function resetPosition() {
-        index = slidesPerView;
-        sliderContent.style.transition = "none";
-        sliderContent.style.transform = `translateX(-${getWidthSlide() * index}px)`;
+    /* 🔹 Movimiento */
+    function updateCarousel(animate = true) {
+
+        const slideWidth = slides[0].getBoundingClientRect().width;
+
+        const gap = parseFloat(
+            window.getComputedStyle(sliderContainer).columnGap
+        ) || 0;
+
+        const totalWidth = slideWidth + gap;
+
+
+
+        sliderContainer.style.transition = animate
+            ? 'transform 0.4s ease'
+            : 'none';
+
+        sliderContainer.style.transform =
+            `translateX(-${index * totalWidth}px)`;
     }
 
-    // ------------------------------
-    // ▶️ AUTO PLAY
-    // ------------------------------
-    const startAutoPlay = () => {
-        if (intervalID) clearInterval(intervalID);
 
-        intervalID = setInterval(() => {
-            if (isMoving) return;
-            isMoving = true;
+    /* 🔹 NEXT reutilizable */
+    function goNext() {
+        index++;
+        updateCarousel();
 
-            index += slidesPerView;
-            sliderContent.style.transition = "transform .7s cubic-bezier(0.83, 0, 0.17, 1)";
-            sliderContent.style.transform = `translateX(-${getWidthSlide() * index}px)`;
-        }, speed);
-    };
-
-    const stopAutoPlay = () => {
-        clearInterval(intervalID);
-        intervalID = null;
-    };
-
-    // ------------------------------
-    // 🔁 INICIO
-    // ------------------------------
-    createClones();
-    resetPosition();
-    startAutoPlay();
-
-    // ------------------------------
-    // 🔁 INFINITE LOOP
-    // ------------------------------
-    sliderContent.addEventListener("transitionend", () => {
-        isMoving = false;
-        const total = slideItem.length;
-
-        if (index >= total - slidesPerView) {
-            resetPosition(); 
+        if (index === slides.length - imagesPerView()) {
+            setTimeout(() => {
+                index = imagesPerView();
+                updateCarousel(false);
+            }, 400);
         }
+    }
 
-        if (index < slidesPerView) {
-            index = total - slidesPerView * 2;
-            sliderContent.style.transition = "none";
-            sliderContent.style.transform = `translateX(-${getWidthSlide() * index}px)`;
-        }
+    /* 🔹 Autoplay */
+    function startAutoplay() {
+        stopAutoplay();
+        autoplayInterval = setInterval(goNext, AUTOPLAY_TIME);
+    }
+
+    function stopAutoplay() {
+        clearInterval(autoplayInterval);
+    }
+
+    /* 🔹 INIT */
+    cloneSlides();
+    updateCarousel(false);
+    startAutoplay();
+
+    /* 👉 CONTROLES */
+    next.addEventListener('click', () => {
+        goNext();
+        startAutoplay();
     });
 
-    // ------------------------------
-    // ⏭️ BOTÓN NEXT
-    // ------------------------------
-    if (buttonNext) {
-        buttonNext.addEventListener("click", () => {
-            if (isMoving) return;
-            isMoving = true;
+    prev.addEventListener('click', () => {
+        index--;
+        updateCarousel();
 
-            stopAutoPlay();
-            index += slidesPerView;
-            sliderContent.style.transition = "transform .7s cubic-bezier(0.83, 0, 0.17, 1)";
-            sliderContent.style.transform = `translateX(-${getWidthSlide() * index}px)`;
-            startAutoPlay();
-        });
-    }
-
-    // ------------------------------
-    // ⏮️ BOTÓN PREV
-    // ------------------------------
-    if (buttonPreview) {
-        buttonPreview.addEventListener("click", () => {
-            if (isMoving) return;
-            isMoving = true;
-
-            stopAutoPlay();
-            index -= slidesPerView;
-            sliderContent.style.transition = "transform .7s cubic-bezier(0.83, 0, 0.17, 1)";
-            sliderContent.style.transform = `translateX(-${getWidthSlide() * index}px)`;
-            startAutoPlay();
-        });
-    }
-
-    // ------------------------------
-    // ⛔ PAUSAR SI CAMBIA DE PESTAÑA
-    // ------------------------------
-    document.addEventListener("visibilitychange", () => {
-        if (document.hidden) stopAutoPlay();
-        else startAutoPlay();
-    });
-
-    // ------------------------------
-    // 📏 RESIZE — RECREAR TODO
-    // ------------------------------
-    window.addEventListener("resize", () => {
-        stopAutoPlay();
-
-        const newSlidesPerView = window.innerWidth >= 768 ? 3 : 1;
-
-        if (newSlidesPerView !== slidesPerView) {
-            slidesPerView = newSlidesPerView;
-            createClones();
-            resetPosition();
-        } else {
-            // solo recalcular posición
-            resetPosition();
+        if (index === 0) {
+            setTimeout(() => {
+                index = slides.length - imagesPerView() * 2;
+                updateCarousel(false);
+            }, 400);
         }
-
-        startAutoPlay();
+        startAutoplay();
     });
+
+    /* ⏸ Pausar en hover */
+    sliderContainer.addEventListener('mouseenter', stopAutoplay);
+    sliderContainer.addEventListener('mouseleave', startAutoplay);
+
+    /* 🔁 Resize */
+    window.addEventListener('resize', () => {
+        cloneSlides();
+        updateCarousel(false);
+        startAutoplay();
+    });
+
 };

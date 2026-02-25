@@ -11,3 +11,30 @@
 @import "servicios/servicios";
 @import "ubicacion/ubicacion";
 @import "animation/animation";
+
+.counter {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    row-gap: 20px;
+    padding: 50px 20px;
+    text-align: center;
+
+    @include mediaFrom(md) {
+        flex-direction: row;
+    }
+
+    &__content__title {
+        font-size: 64px;
+        color: $colorPrimary;
+        font-weight: $font-bold;
+        margin: 0;
+    }
+
+    &__content__text {
+        margin-top: 10px;
+        font-size: 20px;
+        color: $colorTertiary;
+    }
+}
